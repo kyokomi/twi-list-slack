@@ -97,7 +97,9 @@ func doMain(c *cli.Context) {
 	}
 
 	// Streamingする
-	tc.User.Stream(func(data []byte) bool {
+	params := make(map[string]string)
+	params["replies"] = "all"
+	tc.User.Stream(params, func(data []byte) bool {
 		text := string(data)
 		if len(text) == 0 {
 			return false

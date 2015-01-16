@@ -135,9 +135,9 @@ type Streaming struct {
 	User                 User        `json:"user"`
 }
 
-func (u *UserService) Stream(streamHandler Handle) error {
+func (u *UserService) Stream(params map[string]string, streamHandler Handle) error {
 
-	res, err := u.client.Get(userStreamURL, nil)
+	res, err := u.client.Get(userStreamURL, params)
 	if err != nil {
 		return err
 	}
