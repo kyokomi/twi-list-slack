@@ -99,7 +99,9 @@ func doMain(c *cli.Context) {
 		var s twitter.Streaming
 		if err := json.Unmarshal(data, &s); err != nil {
 			fmt.Println("error json parse => ", text)
-			return true
+			// TODO: なんかfavったらeventとか別のjsonがくるから一旦logだけ出してスルー
+//			return true
+			return false
 		}
 
 		// TODO: debug log
