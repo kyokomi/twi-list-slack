@@ -10,9 +10,9 @@ import (
 
 	"encoding/json"
 
+	"github.com/kyokomi/twi-list-slack/slack"
 	"github.com/kyokomi/twi-list-slack/twitter"
 	"github.com/ttacon/chalk"
-	"github.com/kyokomi/twi-list-slack/slack"
 )
 
 func main() {
@@ -66,6 +66,7 @@ func main() {
 
 func doMain(c *cli.Context) {
 
+	// TwitterClient
 	ck := c.GlobalString("ck")
 	cs := c.String("cs")
 	at := c.String("at")
@@ -74,20 +75,19 @@ func doMain(c *cli.Context) {
 	var tc *twitter.Client
 	tc = twitter.NewClient(ck, cs, at, ats)
 
-//	// 対象のListのTwitterアカウントを特定する
-//	members, err := tc.Lists.GetMembers(c.String("list-id"))
-//	if err != nil {
-//		log.Fatalln(err)
-//	}
-//
-//	for _, user := range members.Users {
-//		fmt.Println(user.Name, user.ID)
-//	}
-
+	// SlackClient
 	incomingURL := c.String("incomingURL")
 
 	var sc *slack.Client
 	sc = slack.NewClient(incomingURL)
+
+	// Filter生成
+	// TODO: とりあえず一旦はListID固定 設定ファイルとかから読み込むようにしたい
+	listID := c.String("list-id")
+	filter, err := NewListIDFilter(tc, listID)
+	if err != nil {
+		log.Println(err)
+	}
 
 	// Streamingする
 	tc.User.Stream(func(data []byte) bool {
@@ -99,8 +99,12 @@ func doMain(c *cli.Context) {
 		var s twitter.Streaming
 		if err := json.Unmarshal(data, &s); err != nil {
 			fmt.Println("error json parse => ", text)
-			// TODO: なんかfavったらeventとか別のjsonがくるから一旦logだけ出してスルー
-//			return true
+			// TODO: favったらeventとか別のjsonがくるから一旦logだけ出してスルー
+			//			return true
+			return false
+		}
+
+		if !filter.filter(s) {
 			return false
 		}
 
@@ -118,7 +122,7 @@ func doMain(c *cli.Context) {
 			message.IconURL = s.User.ProfileImageURL
 
 			if err := sc.SendMessage(message); err != nil {
-				log.Println(err)
+				fmt.Println("error send message => ", err)
 			}
 		}()
 
