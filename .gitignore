@@ -33,4 +33,5 @@ _testmain.go
 *.test
 *.prof
 
+twi-list-slack
 
