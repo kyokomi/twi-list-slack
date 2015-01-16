@@ -1,0 +1,20 @@
+{
+	"ImportPath": "github.com/kyokomi/twi-list-slack",
+	"GoVersion": "go1.4",
+	"Deps": [
+		{
+			"ImportPath": "github.com/codegangsta/cli",
+			"Comment": "1.2.0-22-g687db20",
+			"Rev": "687db20fc379d1686465a28e9959707cd1acc990"
+		},
+		{
+			"ImportPath": "github.com/mrjones/oauth",
+			"Rev": "3f16dcc42f866917f38646e7448993412f3a7be7"
+		},
+		{
+			"ImportPath": "github.com/ttacon/chalk",
+			"Comment": "v0.1",
+			"Rev": "76b3c8b611dea8f83e49e9ce81fc2b189e0ef3d2"
+		}
+	]
+}
