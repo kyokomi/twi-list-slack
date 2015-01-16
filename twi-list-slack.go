@@ -55,6 +55,12 @@ func main() {
 			EnvVar: "TWLS_LIST_ID",
 		},
 		cli.StringFlag{
+			Name:   "cn",
+			Value:  "#twitter",
+			Usage:  "slack channel name",
+			EnvVar: "TWLS_SLACK_CHANNEL_NAME",
+		},
+		cli.StringFlag{
 			Name:   "incomingURL",
 			Value:  "",
 			Usage:  "slack incomingURL",
@@ -71,6 +77,7 @@ func doMain(c *cli.Context) {
 	cs := c.String("cs")
 	at := c.String("at")
 	ats := c.String("ats")
+	channelName := c.String("cn")
 
 	var tc *twitter.Client
 	tc = twitter.NewClient(ck, cs, at, ats)
@@ -116,7 +123,7 @@ func doMain(c *cli.Context) {
 		// Slack Send
 		go func() {
 			message := slack.OutgoingMessage{}
-			message.Channel = "#twitter"
+			message.Channel = channelName
 			message.Username = fmt.Sprintf("%s@%s", s.User.Name, s.User.ScreenName)
 			message.Text = s.Text
 			message.IconURL = s.User.ProfileImageURL
