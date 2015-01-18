@@ -33,9 +33,11 @@ func (c Client) SendMessage(message OutgoingMessage) error {
 		return err
 	}
 
-	if _, err := http.PostForm(c.incomingURL, url.Values{"payload": {string(body)}}); err != nil {
+	res, err := http.PostForm(c.incomingURL, url.Values{"payload": {string(body)}})
+	if err != nil {
 		return err
 	}
+	defer res.Body.Close()
 
 	return nil
 }
