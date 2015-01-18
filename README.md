@@ -47,18 +47,7 @@ $ twi-list-slack config --filePath config.json
 $ twi-list-slack
 ```
 
-## Install
-
-To install, use `go get`:
-
-```bash
-$ go get github.com/kyokomi/twi-list-slack
-```
-
-## Setup 
-`env` or `flag`
-
-### Env
+Env:
 
 ```bash
 # Twitter OAuth
@@ -81,10 +70,10 @@ imcoming URL:
 
 ![imcoming2](https://qiita-image-store.s3.amazonaws.com/0/40887/6013f80f-c44b-3ac7-100d-acc03e9df447.png "スクリーンショット_2015-01-16_20_59_01.png")
 
-### Flags
+Flags:
 
 ```bash
-$ twi-list-slack  --help
+$ ./twi-list-slack --help
 NAME:
    twi-list-slack -
 
@@ -98,6 +87,7 @@ AUTHOR:
   kyokomi - <kyoko1220adword@gmail.com>
 
 COMMANDS:
+   config, c
    help, h	Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
@@ -110,6 +100,14 @@ GLOBAL OPTIONS:
    --incomingURL 	slack incomingURL [$TWLS_INCOMING_URL]
    --help, -h		show help
    --version, -v	print the version
+```
+
+## Install
+
+To install, use `go get`:
+
+```bash
+$ go get github.com/kyokomi/twi-list-slack
 ```
 
 ## Contribution
