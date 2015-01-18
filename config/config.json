@@ -1,0 +1,19 @@
+{
+  "twitter": {
+    "consumerKey": "xxxxxxxxxxxxxxxxxxxxx",
+    "consumerSecret": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "accessToken": "xxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxx",
+    "accessTokenSecret": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  },
+  "filters": [
+    {
+      "channelName": "#twitter",
+      "incomingURL": "https://hooks.slack.com/services/xxxxxxxxxx/xxxxxxxxxxxxxxxxx/xxxxxxxxxxxxx"
+    },
+    {
+      "channelName": "#random",
+      "incomingURL": "https://hooks.slack.com/services/xxxxxx/xxxx/xxxxxx",
+      "list_id": "111111111"
+    }
+  ]
+}

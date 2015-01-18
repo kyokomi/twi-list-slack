@@ -12,6 +12,13 @@ const (
 	accessTokenURL    = "https://api.twitter.com/oauth/access_token"
 )
 
+type Config struct {
+	ConsumerKey       string `json:"consumerKey"`
+	ConsumerSecret    string `json:"consumerSecret"`
+	AccessToken       string `json:"accessToken"`
+	AccessTokenSecret string `json:"accessTokenSecret"`
+}
+
 // Client is Twitter Client
 type Client struct {
 	consumer *oauth.Consumer
@@ -23,6 +30,16 @@ type Client struct {
 
 // NewClient create Twitter Client
 func NewClient(consumerKey, consumerSecret, accessToken, accessTokenSecret string) *Client {
+	c := Config{}
+	c.ConsumerKey = consumerKey
+	c.ConsumerSecret = consumerSecret
+	c.AccessToken = accessToken
+	c.AccessTokenSecret = accessTokenSecret
+	return NewClientConfig(c)
+}
+
+// NewClient create Twitter Client
+func NewClientConfig(config Config) *Client {
 	c := Client{}
 
 	sp := oauth.ServiceProvider{
@@ -30,11 +47,11 @@ func NewClient(consumerKey, consumerSecret, accessToken, accessTokenSecret strin
 		AuthorizeTokenUrl: authorizeTokenURL,
 		AccessTokenUrl:    accessTokenURL,
 	}
-	c.consumer = oauth.NewConsumer(consumerKey, consumerSecret, sp)
+	c.consumer = oauth.NewConsumer(config.ConsumerKey, config.ConsumerSecret, sp)
 
 	c.token = &oauth.AccessToken{
-		Token:  accessToken,
-		Secret: accessTokenSecret,
+		Token:  config.AccessToken,
+		Secret: config.AccessTokenSecret,
 	}
 
 	c.Lists = &ListsService{client: &c}

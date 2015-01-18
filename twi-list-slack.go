@@ -10,6 +10,7 @@ import (
 
 	"encoding/json"
 
+	"github.com/kyokomi/twi-list-slack/config"
 	"github.com/kyokomi/twi-list-slack/slack"
 	"github.com/kyokomi/twi-list-slack/twitter"
 	"github.com/ttacon/chalk"
@@ -23,6 +24,20 @@ func main() {
 	app.Author = "kyokomi"
 	app.Email = "kyoko1220adword@gmail.com"
 	app.Action = doMain
+	app.Commands = []cli.Command{
+		cli.Command{
+			Name:      "config",
+			ShortName: "c",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "filePath",
+					Value: "./config/config.json",
+					Usage: "config json file path",
+				},
+			},
+			Action: doConfig,
+		},
+	}
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:   "ck",
@@ -70,6 +85,18 @@ func main() {
 	app.Run(os.Args)
 }
 
+type TwiListSlack struct {
+	config       *config.TwiListSlackConfig
+	twitter      *twitter.Client
+	slackFilters []SlackFilter
+}
+
+type SlackFilter struct {
+	StreamingFilter
+	channelName string
+	slack       *slack.Client
+}
+
 func doMain(c *cli.Context) {
 
 	// TwitterClient
@@ -78,28 +105,72 @@ func doMain(c *cli.Context) {
 	at := c.String("at")
 	ats := c.String("ats")
 	channelName := c.String("cn")
-
-	var tc *twitter.Client
-	tc = twitter.NewClient(ck, cs, at, ats)
-
-	// SlackClient
 	incomingURL := c.String("incomingURL")
-
-	var sc *slack.Client
-	sc = slack.NewClient(incomingURL)
-
-	// Filter生成
-	// TODO: とりあえず一旦はListID固定 設定ファイルとかから読み込むようにしたい
 	listID := c.String("list-id")
-	filter, err := NewListIDFilter(tc, listID)
-	if err != nil {
-		log.Println(err)
+
+	conf := &config.TwiListSlackConfig{}
+	conf.Twitter.ConsumerKey = ck
+	conf.Twitter.ConsumerSecret = cs
+	conf.Twitter.AccessToken = at
+	conf.Twitter.AccessTokenSecret = ats
+	conf.Filters = []config.Filter{
+		config.Filter{
+			IncomingURL: incomingURL,
+			ChannelName: channelName,
+			ListID:      listID,
+		},
 	}
+
+	exec(conf)
+}
+
+func doConfig(c *cli.Context) {
+	conf, err := config.NewConfig(c.String("filePath"))
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	exec(conf)
+}
+
+func exec(config *config.TwiListSlackConfig) {
+
+	t := TwiListSlack{}
+
+	t.config = config
+	t.twitter = twitter.NewClientConfig(t.config.Twitter)
+
+	t.slackFilters = make([]SlackFilter, 0)
+	for _, filter := range t.config.Filters {
+
+		var sc *slack.Client
+		sc = slack.NewClient(filter.IncomingURL)
+
+		listID := filter.ListID
+		f, err := NewListIDFilter(t.twitter, listID)
+		if err != nil {
+			log.Println(err)
+		}
+
+		fmt.Printf("%s %+v\n", filter.ChannelName, f)
+
+		sf := SlackFilter{
+			StreamingFilter: f,
+			channelName:     filter.ChannelName,
+			slack:           sc,
+		}
+		t.slackFilters = append(t.slackFilters, sf)
+	}
+
+	t.stream()
+}
+
+func (t *TwiListSlack) stream() {
 
 	// Streamingする
 	params := make(map[string]string)
 	params["replies"] = "all"
-	tc.User.Stream(params, func(data []byte) bool {
+	t.twitter.User.Stream(params, func(data []byte) bool {
 		text := string(data)
 		if len(text) == 0 {
 			return false
@@ -113,27 +184,28 @@ func doMain(c *cli.Context) {
 			return false
 		}
 
-		if !filter.filter(s) {
-			return false
-		}
+		for _, f := range t.slackFilters {
+			if !f.StreamingFilter.filter(s) {
+				return false
+			}
 
-		// TODO: debug log
-		h := chalk.Yellow.Color(fmt.Sprintf("%s : %s@%s \n", s.CreatedAt, s.User.Name, s.User.ScreenName))
-		b := fmt.Sprintf("> %s\n", s.Text)
-		fmt.Print(h, b)
+			// TODO: debug log
 
-		// Slack Send
-		go func() {
+			h := chalk.Yellow.Color(fmt.Sprintf("[%s] %s : %s@%s \n", f.channelName, s.CreatedAt, s.User.Name, s.User.ScreenName))
+			b := fmt.Sprintf("> %s\n", s.Text)
+			fmt.Print(h, b)
+
+			// Slack Send
 			message := slack.OutgoingMessage{}
-			message.Channel = channelName
+			message.Channel = f.channelName
 			message.Username = fmt.Sprintf("%s@%s", s.User.Name, s.User.ScreenName)
 			message.Text = s.Text
 			message.IconURL = s.User.ProfileImageURL
 
-			if err := sc.SendMessage(message); err != nil {
+			if err := f.slack.SendMessage(message); err != nil {
 				fmt.Println("error send message => ", err)
 			}
-		}()
+		}
 
 		return false
 	})
