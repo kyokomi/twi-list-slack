@@ -8,6 +8,7 @@ import (
 )
 
 type TwiListSlackConfig struct {
+	Debug   bool           `json:"debug"`
 	Filters []Filter       `json:"filters"`
 	Twitter twitter.Config `json:"twitter"`
 }

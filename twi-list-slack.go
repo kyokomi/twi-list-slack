@@ -178,6 +178,7 @@ func (t *TwiListSlack) stream() {
 
 		var s twitter.Streaming
 		if err := json.Unmarshal(data, &s); err != nil {
+			fmt.Println("json Unmarshal error ", err)
 			fmt.Println("error json parse => ", text)
 			// TODO: favったらeventとか別のjsonがくるから一旦logだけ出してスルー
 			//			return true
@@ -190,10 +191,9 @@ func (t *TwiListSlack) stream() {
 			}
 
 			// TODO: debug log
-
-			h := chalk.Yellow.Color(fmt.Sprintf("[%s] %s : %s@%s \n", f.channelName, s.CreatedAt, s.User.Name, s.User.ScreenName))
-			b := fmt.Sprintf("> %s\n", s.Text)
-			fmt.Print(h, b)
+			if t.config.Debug {
+				fmt.Println(chalk.Red.Color(text))
+			}
 
 			// Slack Send
 			message := slack.OutgoingMessage{}
@@ -208,6 +208,11 @@ func (t *TwiListSlack) stream() {
 			}
 
 			message.IconURL = s.User.ProfileImageURL
+
+			// TODO: debug log
+			h := chalk.Yellow.Color(fmt.Sprintf("[%s] %s\n", message.Channel, message.Username))
+			b := fmt.Sprintf("> %s\n", message.Text)
+			fmt.Print(h, b)
 
 			if err := f.slack.SendMessage(message); err != nil {
 				fmt.Println("error send message => ", err)
