@@ -7,13 +7,41 @@ twitter list send to slack for golang
 ## Demo
 ![demo](https://qiita-image-store.s3.amazonaws.com/0/40887/2c919683-8cba-116d-4563-bfb57573a80a.png "スクリーンショット_2015-01-16_22_11_08.png")
 
-### TODO
-
-- [ ] Filterの設定を外部ファイルに出す
-- [ ] Filter単位でSlackのImcomingURLとChannelを設定できるようにする
-- [ ] User.Streamのparamsをstructにする
-
 ## Usage
+
+### config
+
+Multiple slack channel support.
+
+```bash
+$ twi-list-slack config --filePath config.json
+```
+
+`config.json` is [sample](https://github.com/kyokomi/twi-list-slack/blob/master/config/config.json)
+
+```
+{
+  "twitter": {
+    "consumerKey": "xxxxxxxxxxxxxxxxxxxxx",
+    "consumerSecret": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "accessToken": "xxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxx",
+    "accessTokenSecret": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  },
+  "filters": [
+    {
+      "channelName": "#twitter",
+      "incomingURL": "https://hooks.slack.com/services/xxxxxxxxxx/xxxxxxxxxxxxxxxxx/xxxxxxxxxxxxx"
+    },
+    {
+      "channelName": "#random",
+      "incomingURL": "https://hooks.slack.com/services/xxxxxx/xxxx/xxxxxx",
+      "list_id": "111111111"
+    }
+  ]
+}
+```
+
+### 'env' or 'flag'
 
 ```bash
 $ twi-list-slack
