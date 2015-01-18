@@ -112,6 +112,7 @@ type Streaming struct {
 		Symbols      []interface{} `json:"symbols"`
 		Urls         []interface{} `json:"urls"`
 		UserMentions []interface{} `json:"user_mentions"`
+		Medias       []Media       `json:"media"`
 	} `json:"entities"`
 	FavoriteCount        int         `json:"favorite_count"`
 	Favorited            bool        `json:"favorited"`
@@ -133,6 +134,40 @@ type Streaming struct {
 	TimestampMs          string      `json:"timestamp_ms"`
 	Truncated            bool        `json:"truncated"`
 	User                 User        `json:"user"`
+}
+
+type Media struct {
+	DisplayURL    string `json:"display_url"`
+	ExpandedURL   string `json:"expanded_url"`
+	ID            int    `json:"id"`
+	IDStr         string `json:"id_str"`
+	Indices       []int  `json:"indices"`
+	MediaURL      string `json:"media_url"`
+	MediaURLHTTPS string `json:"media_url_https"`
+	Sizes         struct {
+		Large struct {
+			H      int    `json:"h"`
+			Resize string `json:"resize"`
+			W      int    `json:"w"`
+		} `json:"large"`
+		Medium struct {
+			H      int    `json:"h"`
+			Resize string `json:"resize"`
+			W      int    `json:"w"`
+		} `json:"medium"`
+		Small struct {
+			H      int    `json:"h"`
+			Resize string `json:"resize"`
+			W      int    `json:"w"`
+		} `json:"small"`
+		Thumb struct {
+			H      int    `json:"h"`
+			Resize string `json:"resize"`
+			W      int    `json:"w"`
+		} `json:"thumb"`
+	} `json:"sizes"`
+	Type string `json:"type"`
+	URL  string `json:"url"`
 }
 
 func (u *UserService) Stream(params map[string]string, streamHandler Handle) error {

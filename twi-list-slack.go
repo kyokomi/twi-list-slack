@@ -30,7 +30,7 @@ func main() {
 			ShortName: "c",
 			Flags: []cli.Flag{
 				cli.StringFlag{
-					Name:  "filePath",
+					Name:  "filePath,f",
 					Value: "./config/config.json",
 					Usage: "config json file path",
 				},
@@ -200,6 +200,13 @@ func (t *TwiListSlack) stream() {
 			message.Channel = f.channelName
 			message.Username = fmt.Sprintf("%s@%s", s.User.Name, s.User.ScreenName)
 			message.Text = s.Text
+			// 画像があれば追加する
+			if len(s.Entities.Medias) > 0 {
+				for _, media := range s.Entities.Medias {
+					message.Text += fmt.Sprintf("\n%s", media.MediaURL)
+				}
+			}
+
 			message.IconURL = s.User.ProfileImageURL
 
 			if err := f.slack.SendMessage(message); err != nil {
