@@ -41,13 +41,7 @@ $ twi-list-slack config --filePath config.json
 }
 ```
 
-### 'env' or 'flag'
-
-```bash
-$ twi-list-slack
-```
-
-Env:
+### environment variables
 
 ```bash
 # Twitter OAuth
@@ -61,6 +55,10 @@ export TWLS_LIST_ID=123456789
 export TWLS_INCOMING_URL=https://hooks.slack.com/services/xxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
+```bash
+$ twi-list-slack
+```
+
 - [TWLS_LIST_ID](https://dev.twitter.com/rest/reference/get/lists/members): The numerical id of the list.
 - [TWLS_INCOMING_URL](https://my.slack.com/services/new/incoming-webhook): Send data into Slack in real-time.
 
@@ -70,7 +68,7 @@ imcoming URL:
 
 ![imcoming2](https://qiita-image-store.s3.amazonaws.com/0/40887/6013f80f-c44b-3ac7-100d-acc03e9df447.png "スクリーンショット_2015-01-16_20_59_01.png")
 
-Flags:
+### Command line options
 
 ```bash
 $ ./twi-list-slack --help
