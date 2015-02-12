@@ -10,6 +10,8 @@ import (
 
 	"encoding/json"
 
+	"time"
+
 	"github.com/kyokomi/twi-list-slack/config"
 	"github.com/kyokomi/twi-list-slack/slack"
 	"github.com/kyokomi/twi-list-slack/twitter"
@@ -162,7 +164,13 @@ func exec(config *config.TwiListSlackConfig) {
 		t.slackFilters = append(t.slackFilters, sf)
 	}
 
-	t.stream()
+	for {
+		fmt.Println("start")
+
+		t.stream()
+
+		time.Sleep(5 * time.Second)
+	}
 }
 
 func (t *TwiListSlack) stream() {
